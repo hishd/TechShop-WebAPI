@@ -121,7 +121,6 @@ const deleteUser = asyncHandler(async (req, res) => {
   }
 })
 
-//Added missing exports
 export {
   authUser,
   getUserProfile,
