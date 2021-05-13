@@ -1,13 +1,13 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { Card } from 'react-bootstrap'
+import { Card, Button } from 'react-bootstrap'
 import Rating from './Rating'
 
 const Product = ({ product }) => {
   return (
     <Card
       className='shadow-lg p-3 mb-5 bg-white rounded'
-      style={{ height: '25rem' }}
+      style={{ height: '26rem', position: 'relative' }}
     >
       <Link to={`/product/${product._id}`}>
         <Card.Img
@@ -31,6 +31,14 @@ const Product = ({ product }) => {
           />
         </Card.Text>
         <Card.Text as='h4'>LKR {product.price}</Card.Text>
+        <Link to={`/product/${product._id}`}>
+          <Button
+            className='btn btn-primary btn-sm rounded'
+            style={{ position: 'absolute', right: 20, bottom: 20 }}
+          >
+            view product
+          </Button>
+        </Link>
       </Card.Body>
     </Card>
   )
