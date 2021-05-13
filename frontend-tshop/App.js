@@ -19,6 +19,7 @@ import ProductListScreen from './Screens/ProductListScreen'
 import ProductEditScreen from './Screens/ProductEditScreen'
 import OrderListScreen from './Screens/OrderListScreen'
 
+// created
 const App = () => {
   return (
     <ConfirmProvider>
@@ -40,15 +41,9 @@ const App = () => {
                 component={ProductListScreen}
                 exact
               />
-              
 
-
-
-              
-
-
-
-              
+              <Route path='/' component={HomeScreen} exact />
+              <Route path='/product/:id' component={ProductScreen} />
               <Route path='/shipping' component={ShippingScreen} />
               <Route path='/payment' component={PaymentScreen} />
               <Route path='/placeorder' component={PlaceOrderScreen} />
@@ -74,4 +69,3 @@ const App = () => {
 }
 
 export default App
-© 2021 GitHub, Inc.
