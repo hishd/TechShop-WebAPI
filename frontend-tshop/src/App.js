@@ -59,7 +59,7 @@ const App = () => {
                 exact
               />
               <Route
-                path='/admin/product/:id/edit'
+                path='/admin/product/:id/edit/:currentPage'
                 component={ProductEditScreen}
               />
               <Route path='/admin/orderList' component={OrderListScreen} />

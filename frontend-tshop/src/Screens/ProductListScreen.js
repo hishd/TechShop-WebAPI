@@ -116,7 +116,9 @@ const ProductListScreen = ({ history, match }) => {
                   <td>{product.category}</td>
                   <td>{product.brand}</td>
                   <td>
-                    <LinkContainer to={`/admin/product/${product._id}/edit`}>
+                    <LinkContainer
+                      to={`/admin/product/${product._id}/edit/${pageNumber}`}
+                    >
                       <BootStapButton variant='dark' className='btn-sm'>
                         <i className='fas fa-edit'></i>
                       </BootStapButton>

@@ -11,6 +11,7 @@ import axios from 'axios'
 
 const ProductEditScreen = ({ match, history }) => {
   const ProductID = match.params.id
+  const previousPage = match.params.currentPage || 1
 
   const [name, setName] = useState('')
   const [price, setPrice] = useState(0)
@@ -69,7 +70,7 @@ const ProductEditScreen = ({ match, history }) => {
 
     if (successUpdate) {
       dispatch({ type: PRODUCT_UPDATEE_RESET })
-      history.push('/admin/productList')
+      history.push(`/admin/productList/${previousPage}`)
     } else {
       if (!product.name || product._id !== ProductID) {
         dispatch(listProductDetails(ProductID))
