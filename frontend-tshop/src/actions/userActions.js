@@ -16,6 +16,7 @@ import {
   USER_LOGOUT,
   USER_REGISTER_FAIL,
   USER_REGISTER_REQUEST,
+  USER_REGISTER_RESET,
   USER_REGISTER_SUCCESS,
   USER_UPDATE_FAIL,
   USER_UPDATE_REQUEST,
@@ -24,7 +25,7 @@ import {
 import axios from 'axios'
 import { ORDER_LIST_MY_RESET } from '../constants/orderConstants'
 
-export const login = (email, password) => async (dispatch) => {
+export const login = (email, password, authType) => async (dispatch) => {
   try {
     dispatch({
       type: USER_LOGIN_REQUEST,
@@ -38,7 +39,7 @@ export const login = (email, password) => async (dispatch) => {
 
     const { data } = await axios.post(
       '/api/users/login',
-      { email, password },
+      { email, password, authType: 'google' },
       config
     )
 
@@ -74,9 +75,12 @@ export const logout = () => (dispatch) => {
   dispatch({
     type: USER_LIST_RESET,
   })
+  dispatch({
+    type: USER_REGISTER_RESET,
+  })
 }
 
-export const register = (name, email, password) => async (dispatch) => {
+export const register = (name, email, password, type) => async (dispatch) => {
   try {
     dispatch({
       type: USER_REGISTER_REQUEST,
@@ -88,23 +92,43 @@ export const register = (name, email, password) => async (dispatch) => {
       },
     }
 
-    const { data } = await axios.post(
-      '/api/users',
-      { name, email, password },
-      config
-    )
+    if (type && type === 'google') {
+      const { data } = await axios.post(
+        '/api/users',
+        { name, email, authType: 'google' },
+        config
+      )
 
-    dispatch({
-      type: USER_REGISTER_SUCCESS,
-      payload: data,
-    })
+      dispatch({
+        type: USER_REGISTER_SUCCESS,
+        payload: data,
+      })
 
-    dispatch({
-      type: USER_LOGIN_SUCCESS,
-      payload: data,
-    })
+      dispatch({
+        type: USER_LOGIN_SUCCESS,
+        payload: data,
+      })
 
-    localStorage.setItem('userInfo', JSON.stringify(data))
+      localStorage.setItem('userInfo', JSON.stringify(data))
+    } else {
+      const { data } = await axios.post(
+        '/api/users',
+        { name, email, password, authType: 'default' },
+        config
+      )
+
+      dispatch({
+        type: USER_REGISTER_SUCCESS,
+        payload: data,
+      })
+
+      dispatch({
+        type: USER_LOGIN_SUCCESS,
+        payload: data,
+      })
+
+      localStorage.setItem('userInfo', JSON.stringify(data))
+    }
   } catch (error) {
     dispatch({
       type: USER_REGISTER_FAIL,

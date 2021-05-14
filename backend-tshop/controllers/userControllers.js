@@ -23,31 +23,58 @@ const authUser = asyncHandler(async (req, res) => {
     throw new Error('Invalid email address')
   }
 
-  if (!validatePassword(password)) {
-    throw new Error('Invalid password')
-  }
-
   const user = await User.findOne({ email: email })
 
-  if (user && (await user.matchPassword(password))) {
-    res.json({
-      _id: user._id,
-      name: user.name,
-      email: user.email,
-      isAdmin: user.isAdmin,
-      token: generateToken(user._id),
-    })
+  //Added google sign in
+  if (user) {
+    if (req.body.authType && req.body.authType === 'google') {
+      res.json({
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        isAdmin: user.isAdmin,
+        token: generateToken(user._id),
+      })
+    } else {
+      if (!validatePassword(password)) {
+        throw new Error('Invalid password')
+      }
+
+      if (await user.matchPassword(password)) {
+        res.json({
+          _id: user._id,
+          name: user.name,
+          email: user.email,
+          isAdmin: user.isAdmin,
+          token: generateToken(user._id),
+        })
+      }
+    }
   } else {
     res.status(401)
     throw new Error('Invalid email or password')
   }
+
+  //Prev implementation : Nimesh
+  // if (user && (await user.matchPassword(password))) {
+  //   res.json({
+  //     _id: user._id,
+  //     name: user.name,
+  //     email: user.email,
+  //     isAdmin: user.isAdmin,
+  //     token: generateToken(user._id),
+  //   })
+  // } else {
+  //   res.status(401)
+  //   throw new Error('Invalid email or password')
+  // }
 })
 
 // @desc Regisgter a new user
 // @route POST /api/users
 // @access Public
 const registerUser = asyncHandler(async (req, res) => {
-  const { name, email, password } = req.body
+  var { name, email, password } = req.body
 
   if (!validateName(name)) {
     throw new Error('Invalid name')
@@ -57,10 +84,18 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new Error('Invalid email address')
   }
 
-  if (!validatePassword(password)) {
-    throw new Error(
-      'Password should between 6-20 chars, with at least one numeric, uppercase & lowercase digit.'
-    )
+  if (!req.body.authType) {
+    throw new Error('No authentication type!')
+  }
+
+  if (req.body.authType === 'google') {
+    password = 'google@123'
+  } else {
+    if (!validatePassword(password)) {
+      throw new Error(
+        'Password should between 6-20 chars, with at least one numeric, uppercase & lowercase digit.'
+      )
+    }
   }
 
   const userExists = await User.findOne({ email: email })

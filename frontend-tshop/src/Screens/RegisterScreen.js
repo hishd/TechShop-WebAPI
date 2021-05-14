@@ -6,6 +6,10 @@ import Message from '../components/Message'
 import Loader from '../components/Loader'
 import FormContainer from '../components/FormContainer'
 import { register } from '../actions/userActions'
+import GoogleLogin from 'react-google-login'
+import dotenv from 'dotenv'
+import { ToastContainer, toast } from 'material-react-toastify'
+import 'material-react-toastify/dist/ReactToastify.css'
 
 const RegisterScreen = ({ location, history }) => {
   const [name, setName] = useState('')
@@ -15,6 +19,7 @@ const RegisterScreen = ({ location, history }) => {
   const [message, setMessage] = useState(null)
 
   const dispatch = useDispatch()
+  dotenv.config()
 
   const userRegister = useSelector((state) => state.userRegister)
   const { loading, error, userInfo } = userRegister
@@ -38,9 +43,53 @@ const RegisterScreen = ({ location, history }) => {
     }
   }
 
+  const handleGoogleSignUp = async (googleData) => {
+    if (!googleData.profileObj.email) {
+      console.log('Email not found')
+      notifyAlert('Google sign up failed !', 'ERROR')
+      return
+    }
+
+    if (!googleData.profileObj.givenName) {
+      console.log('User name not found')
+      notifyAlert('Google sign up failed !', 'ERROR')
+      return
+    }
+
+    dispatch(
+      register(
+        googleData.profileObj.givenName,
+        googleData.profileObj.email,
+        password,
+        'google'
+      )
+    )
+  }
+
+  const notifyAlert = (message, type) => {
+    switch (type) {
+      case 'SUCCESS':
+        toast.success(`${message}`)
+        break
+      case 'ERROR':
+        toast.error(`${message}`)
+        break
+      case 'WARN':
+        toast.warning(`${message}`)
+        break
+      case 'INFO':
+        toast.info(`${message}`)
+        break
+      default:
+        toast(`${message}`)
+        break
+    }
+  }
+
   return (
     <FormContainer>
       <h1>Sign Up</h1>
+      <ToastContainer />
       {message && <Message variant='danger'>{message}</Message>}
       {error && <Message variant='danger'>{error}</Message>}
       {loading && <Loader />}
@@ -85,15 +134,24 @@ const RegisterScreen = ({ location, history }) => {
             onChange={(e) => setConfirmPassword(e.target.value)}
           ></Form.Control>
         </Form.Group>
-        <Form.Group className='form-group'>
-          <Button type='submit' variant='primary' className='btn-signin'>
+        <Form.Group className='form-group' style={{ textAlign: 'center' }}>
+          <Button type='submit' variant='primary' className='btn-signin col-4'>
             Sign Up
           </Button>
+        </Form.Group>
+        <Form.Group className='form-group' style={{ textAlign: 'center' }}>
+          <GoogleLogin
+            clientId={`${process.env.REACT_APP_GOOGLE_CLIENT_ID}`}
+            buttonText='Sign up with Google'
+            onSuccess={handleGoogleSignUp}
+            onFailure={handleGoogleSignUp}
+            cookiePolicy={'single_host_origin'}
+          />
         </Form.Group>
       </Form>
 
       <Row className='py-3'>
-        <Col>
+        <Col style={{ textAlign: 'center' }}>
           Already registered?{' '}
           <Link to={redirect ? `/login?redirect=${redirect}` : '/login'}>
             Sign in
