@@ -1,12 +1,32 @@
 import asyncHandler from 'express-async-handler'
 import User from '../models/userModel.js'
 import generateToken from '../utils/generateToken.js'
+import emailValidator from 'email-validator'
+
+const validateName = (name) => {
+  var re = /^[a-zA-Z ]+$/
+  return re.test(name)
+}
+
+const validatePassword = (password) => {
+  var re = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20}$/
+  return re.test(password)
+}
 
 // @desc Auth user and get a token
 // @route POST /api/users/login
 // @access Public
 const authUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body
+
+  if (!emailValidator.validate(email)) {
+    throw new Error('Invalid email address')
+  }
+
+  if (!validatePassword(password)) {
+    throw new Error('Invalid password')
+  }
+
   const user = await User.findOne({ email: email })
 
   if (user && (await user.matchPassword(password))) {
@@ -28,6 +48,21 @@ const authUser = asyncHandler(async (req, res) => {
 // @access Public
 const registerUser = asyncHandler(async (req, res) => {
   const { name, email, password } = req.body
+
+  if (!validateName(name)) {
+    throw new Error('Invalid name')
+  }
+
+  if (!emailValidator.validate(email)) {
+    throw new Error('Invalid email address')
+  }
+
+  if (!validatePassword(password)) {
+    throw new Error(
+      'Password should between 6-20 chars, with at least one numeric, uppercase & lowercase digit.'
+    )
+  }
+
   const userExists = await User.findOne({ email: email })
 
   if (userExists) {
@@ -77,11 +112,25 @@ const getUserProfile = asyncHandler(async (req, res) => {
 // @route PUT /api/users/profile
 // @access Private
 const updateUserProfile = asyncHandler(async (req, res) => {
+  if (!validateName(req.body.name)) {
+    throw new Error('Invalid name')
+  }
+
+  if (!emailValidator.validate(req.body.email)) {
+    throw new Error('Invalid email address')
+  }
+
   const user = await User.findById(req.user._id)
   if (user) {
     user.name = req.body.name || user.name
     user.email = req.body.email || user.email
     if (req.body.password) {
+      if (!validatePassword(password)) {
+        throw new Error(
+          'Password should between 6-20 chars, with at least one numeric, uppercase & lowercase digit.'
+        )
+      }
+
       user.password = req.body.password
     }
 

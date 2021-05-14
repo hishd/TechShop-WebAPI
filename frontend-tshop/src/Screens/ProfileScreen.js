@@ -7,6 +7,8 @@ import Loader from '../components/Loader'
 import { getUserDetails, updateUserProfile } from '../actions/userActions'
 import { listMyOrders } from '../actions/orderActions'
 import { USER_UPDATE_RESET } from '../constants/userConstants'
+import { ToastContainer, toast } from 'material-react-toastify'
+import 'material-react-toastify/dist/ReactToastify.css'
 
 const ProfileScreen = ({ location, history }) => {
   const [name, setName] = useState('')
@@ -29,10 +31,37 @@ const ProfileScreen = ({ location, history }) => {
   const orderMyList = useSelector((state) => state.orderMyList)
   const { loading: loadingOrders, orders, error: errorOrders } = orderMyList
 
+  const notifyAlert = (message, type) => {
+    switch (type) {
+      case 'SUCCESS':
+        toast.success(`${message}`)
+        break
+      case 'ERROR':
+        toast.error(`${message}`)
+        break
+      case 'WARN':
+        toast.warning(`${message}`)
+        break
+      case 'INFO':
+        toast.info(`${message}`)
+        break
+      default:
+        toast(`${message}`)
+        break
+    }
+  }
+
   useEffect(() => {
+    setMessage(null)
     if (!userInfo) {
       history.push('/login')
     } else {
+      if (success) {
+        notifyAlert('User updated !', 'SUCCESS')
+        setPassword('')
+        setConfirmPassword('')
+      }
+
       if (!user.name || success) {
         dispatch({ type: USER_UPDATE_RESET })
         dispatch(getUserDetails('profile'))
@@ -58,6 +87,7 @@ const ProfileScreen = ({ location, history }) => {
     <Row>
       <Col md={3}>
         <h2>Profile</h2>
+        <ToastContainer />
         {message && <Message variant='danger'>{message}</Message>}
         {error && <Message variant='danger'>{error}</Message>}
         {success && <Message variant='success'>User updated!</Message>}
@@ -66,6 +96,7 @@ const ProfileScreen = ({ location, history }) => {
           <Form.Group controlId='name' className='form-group'>
             <Form.Label>Enter name</Form.Label>
             <Form.Control
+              required
               type='name'
               placeholder='Enter name'
               value={name}
@@ -75,6 +106,7 @@ const ProfileScreen = ({ location, history }) => {
           <Form.Group controlId='email' className='form-group'>
             <Form.Label>Email Address</Form.Label>
             <Form.Control
+              required
               type='email'
               placeholder='Enter email'
               value={email}
