@@ -159,10 +159,12 @@ const updateUserProfile = asyncHandler(async (req, res) => {
   if (user) {
     user.name = req.body.name || user.name
     user.email = req.body.email || user.email
+
     if (req.body.password) {
-      if (!validatePassword(password)) {
+      if (!validatePassword(req.body.password)) {
         throw new Error(
-          'Password should between 6-20 chars, with at least one numeric, uppercase & lowercase digit.'
+          'Password should between 6-20 chars, with at least one numeric, uppercase & lowercase digit. ' +
+            req.body.password
         )
       }
 

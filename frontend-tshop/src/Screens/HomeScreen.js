@@ -32,11 +32,6 @@ const HomeScreen = ({ match }) => {
         <Message variant='danger'>{error}</Message>
       ) : (
         <>
-          <Paginate
-            pages={pages}
-            page={page}
-            keyword={keyWord ? keyWord : ''}
-          />
           <Row>
             {products.map((product) => (
               <Col key={product._id} sm={12} md={6} lg={4} xl={3}>
@@ -44,6 +39,11 @@ const HomeScreen = ({ match }) => {
               </Col>
             ))}
           </Row>
+          <Paginate
+            pages={pages}
+            page={page}
+            keyword={keyWord ? keyWord : ''}
+          />
         </>
       )}
     </>

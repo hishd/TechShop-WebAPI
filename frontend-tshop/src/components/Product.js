@@ -30,7 +30,7 @@ const Product = ({ product }) => {
             text={`${product.numReviews} reviews`}
           />
         </Card.Text>
-        <Card.Text as='h4'>LKR {product.price}</Card.Text>
+        <Card.Text as='h4'>LKR {Number(product.price).toFixed(2)}</Card.Text>
         <Link to={`/product/${product._id}`}>
           <Button
             className='btn btn-primary btn-sm rounded'
