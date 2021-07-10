@@ -39,7 +39,7 @@ export const login = (email, password, authType) => async (dispatch) => {
 
     const { data } = await axios.post(
       '/api/users/login',
-      { email, password, authType: 'google' },
+      { email, password, authType },
       config
     )
 

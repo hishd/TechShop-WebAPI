@@ -40,6 +40,8 @@ const authUser = asyncHandler(async (req, res) => {
         throw new Error('Invalid password')
       }
 
+      console.log(password)
+
       if (await user.matchPassword(password)) {
         res.json({
           _id: user._id,
@@ -48,6 +50,9 @@ const authUser = asyncHandler(async (req, res) => {
           isAdmin: user.isAdmin,
           token: generateToken(user._id),
         })
+      } else {
+        res.status(401)
+        throw new Error('Invalid email or password')
       }
     }
   } else {
